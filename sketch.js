@@ -191,21 +191,17 @@ function draw() {
 
     const realWidth = width - 2 * padding, realHeight = height - 2 * padding;
     const scaleX = realWidth / graph.width, scaleY = realHeight / graph.height;
-    const size = Math.min(graph.width, graph.height);
 
     translate(padding, padding);
     scale(Math.min(scaleX, scaleY));
 
+    strokeWeight(agent_size/10);
+    stroke(150, 255);
+
     Object.keys(graph).forEach(key => {
         const node = graph[key];
         if (!node.neighbors) return;
-        fill(0, 125);
-        noStroke();
-        ellipse(node.x, node.y, size/100);
-
         for (let i=0; i<node.neighbors.length; i++) {
-            strokeWeight(size/500);
-            stroke(0, 25);
             line(node.x, node.y, node.neighbors[i][0], node.neighbors[i][1]);
         }
     });
@@ -231,5 +227,5 @@ function draw() {
         }
     });
 
-    t += 0.01;
+    t += 0.04;
 }
