@@ -78,8 +78,8 @@ function parseGrid() {
         for (let j=0; j<width; j++) {
             if (grid[i][j] == 0) {
                 graph[i + height * j] = {
-                    x: i,
-                    y: j,
+                    x: j,
+                    y: graph.height-i,
                     neighbors: []
                 };
 
@@ -87,7 +87,7 @@ function parseGrid() {
                 for (let k=0; k<m.length; k++) {
                     if (i + m[k][0] < height && i + m[k][0] >= 0 && j + m[k][1] < width && j + m[k][1] >= 0 &&
                         grid[i+m[k][0]][j+m[k][1]] == 0 && check(grid, i, j, i+m[k][0], j+m[k][1])) {
-                        graph[i + height * j].neighbors.push([i+m[k][0],j+m[k][1]]);
+                        graph[i + height * j].neighbors.push([j+m[k][1],graph.height-i-m[k][0]]);
                     }
                 }
             }
@@ -106,12 +106,17 @@ function parseGraph() {
         let id = nodes[i].id;
         let pos = nodes[i].getElementsByTagName('data')[0].childNodes[0].nodeValue.split(',').map(x => parseFloat(x));
         graph[id] = {
-            x: pos[0],
-            y: pos[1],
+            x: pos[1],
+            y: pos[0],
             neighbors: []
         };
-        graph.width = Math.max(graph.width, pos[0]);
-        graph.height = Math.max(graph.height, pos[1]);
+        graph.width = Math.max(graph.width, graph[id].x);
+        graph.height = Math.max(graph.height, graph[id].y);
+    }
+
+    for (let i=0; i<nodes.length; i++) {
+        let id = nodes[i].id;
+        graph[id].y = graph.height - graph[id].y;
     }
 
     let edges = data.map.xml.getElementsByTagName('edge');
@@ -133,10 +138,10 @@ function parseLog() {
         for (let j=0; j<sections.length; j++) {
             let duration = parseFloat(sections[j].getAttribute('duration'));
             agent[i].push({
-                x1: parseFloat(sections[j].getAttribute('start_i')),
-                y1: parseFloat(sections[j].getAttribute('start_j')),
-                x2: parseFloat(sections[j].getAttribute('goal_i')),
-                y2: parseFloat(sections[j].getAttribute('goal_j')),
+                x1: parseFloat(sections[j].getAttribute('start_j')),
+                y1: graph.height-parseFloat(sections[j].getAttribute('start_i')),
+                x2: parseFloat(sections[j].getAttribute('goal_j')),
+                y2: graph.height-parseFloat(sections[j].getAttribute('goal_i')),
                 t1: cumul,
                 t2: cumul+duration
             });
