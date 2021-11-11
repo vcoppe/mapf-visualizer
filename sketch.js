@@ -5,6 +5,8 @@ let agent_size = Math.sqrt(2)/4;
 let connectedness = 2;
 let graph, agent, t;
 
+let graph_buffer;
+
 const moves = {
     2: [[0,1], [1,0], [-1,0],  [0,-1]],
     3: [[0,1], [1,1], [1,0],  [1,-1],  [0,-1],  [-1,-1], [-1,0], [-1,1]],
@@ -62,7 +64,6 @@ function check(grid, i1, j1, i2, j2) {
 function parseGrid() {
     let width = Number(data.map.xml.getElementsByTagName('width')[0].childNodes[0].nodeValue);
     let height = Number(data.map.xml.getElementsByTagName('height')[0].childNodes[0].nodeValue);
-
 
     graph = {
         width: width-1,
@@ -168,7 +169,30 @@ function parseFiles() {
     if (data.map.xml.getElementsByTagName('grid').length > 0) parseGrid();
     else parseGraph();
 
+    createGraph();
+
     parseLog();
+}
+
+function createGraph() {
+    graph_buffer = createGraphics(width, height);
+    
+    const realWidth = width - 2 * padding, realHeight = height - 2 * padding;
+    const scaleX = realWidth / graph.width, scaleY = realHeight / graph.height;
+
+    graph_buffer.translate(padding, padding);
+    graph_buffer.scale(Math.min(scaleX, scaleY));
+
+    graph_buffer.strokeWeight(agent_size/10);
+    graph_buffer.stroke(150, 255);
+
+    Object.keys(graph).forEach(key => {
+        const node = graph[key];
+        if (!node.neighbors) return;
+        for (let i=0; i<node.neighbors.length; i++) {
+            graph_buffer.line(node.x, node.y, node.neighbors[i][0], node.neighbors[i][1]);
+        }
+    });
 }
 
 function setup() {
@@ -192,24 +216,16 @@ function setup() {
 
 function draw() {
     clear();
+
     if (!graph) return;
+
+    image(graph_buffer, 0, 0);
 
     const realWidth = width - 2 * padding, realHeight = height - 2 * padding;
     const scaleX = realWidth / graph.width, scaleY = realHeight / graph.height;
 
     translate(padding, padding);
     scale(Math.min(scaleX, scaleY));
-
-    strokeWeight(agent_size/10);
-    stroke(150, 255);
-
-    Object.keys(graph).forEach(key => {
-        const node = graph[key];
-        if (!node.neighbors) return;
-        for (let i=0; i<node.neighbors.length; i++) {
-            line(node.x, node.y, node.neighbors[i][0], node.neighbors[i][1]);
-        }
-    });
 
     if (!agent) return;
 
