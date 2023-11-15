@@ -1,7 +1,7 @@
 const width = 800, height = 600, padding = 20;
 
 let data;
-let agent_size = Math.sqrt(2)/4;
+let agent_size = Math.sqrt(2)/2;
 let connectedness = 2;
 let graph, agent, t;
 
@@ -158,7 +158,7 @@ function parseFiles() {
 
     if (data.cfg.ready) {
         if (data.cfg.xml.getElementsByTagName('agent_size').length > 0) {
-            agent_size = Number(data.cfg.xml.getElementsByTagName('agent_size')[0].childNodes[0].nodeValue);
+            agent_size = 2 * Number(data.cfg.xml.getElementsByTagName('agent_size')[0].childNodes[0].nodeValue);
         }
 
         if (data.cfg.xml.getElementsByTagName('connectedness').length > 0) {
